@@ -1,4 +1,5 @@
-import $ from 'jquery';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './components/editor/index';
 
-
-$("h1").fadeOut();
+ReactDOM.render(<App />,document.getElementById('root'));
