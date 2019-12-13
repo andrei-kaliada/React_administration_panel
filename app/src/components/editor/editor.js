@@ -10,13 +10,54 @@ class Editor extends Component {
             pageList:[],
             newPageName:"",
         }
+
+        this.createNewPage = this.createNewPage.bind(this);
+      
     }
 
+    componentDidMount(){
+        this.loadPageList();
+    }
+
+    loadPageList(){
+        axios
+        .get('./api')
+        .then( res => {
+            this.setState({
+                pageList: res.data,
+            })
+        })
+    }
+
+    createNewPage(){
+        axios
+        .post('./api/createNewPage.php',{
+            "name":this.state.newPageName,
+        })
+        .then( this.loadPageList())
+    }
+
+
+
     render() {
+        
+        const { pageList } = this.state;
+        const  pages = pageList.map( (page, i) => {
+            return (
+                <h1 key={i}>{page}</h1>
+            );
+        });
+
         return (
             <>
-                <input type="text" />
-                <button>Create page</button>
+                <input type="text" 
+                onChange={ (event) => {
+                    this.setState({
+                        newPageName:event.target.value,
+                    })
+                }}/>
+                <button onClick={this.createNewPage}>Create page</button>
+                {pages}
             </>
         );
     }
