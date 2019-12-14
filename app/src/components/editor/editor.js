@@ -35,6 +35,20 @@ class Editor extends Component {
             "name":this.state.newPageName,
         })
         .then( this.loadPageList())
+        .catch( () => {
+            alert("Page already added")
+        })
+    }
+
+    deletePage(page){
+        axios
+        .post("./api/deletePage.php",{
+            "name":page,
+        })
+        .then( this.loadPageList())
+        .catch( () => {
+            alert("Page not founded")
+        })
     }
 
 
@@ -44,7 +58,12 @@ class Editor extends Component {
         const { pageList } = this.state;
         const  pages = pageList.map( (page, i) => {
             return (
-                <h1 key={i}>{page}</h1>
+                <h1 key={i}>
+                    {page}
+                    <a href="#"
+                    onClick={this.deletePage(page)}
+                    >(x)</a>
+                </h1>
             );
         });
 
