@@ -29,7 +29,8 @@ gulp.task("build-js", () => {
                             presets:[['@babel/preset-env',{
                                 debug:true,
                                 corejs:3,
-                                useBuiltIns:"usage"
+                                useBuiltIns:"usage",
+                                
                             }], 
                             "@babel/react"]
                         }
