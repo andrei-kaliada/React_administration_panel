@@ -36,13 +36,29 @@ class Editor extends Component {
             .get(`../${page}`)
             .then( res =>this.parseStrToDOM(res.data))
             .then(this.wrapTextNodes)
+            .then( dom => {
+                this.virtualDom = dom;
+                return dom;
+            })
             .then(this.serializeDOMtoString)
             .then(html => axios.post(`./api/saveTempPage.php`,{html}))
             .then(()=> this.iframe.load("../temp.html"))
-        // this.iframe.load(this.currentPage, () => {
-
-        // });
+            .then(()=>this.enableEditing())
             
+    }
+
+    enableEditing(){
+        this.iframe.contentDocument.body.querySelectorAll("text-editor").forEach( element => {
+            element.contentEditable = "true";
+            element.addEventListener("input", () => {
+                this.onTextEdit(element);
+            })
+        });
+    }
+    
+    onTextEdit(element){
+        const id = element.getAttribute("nodeid");
+        this.virtualDom.body.querySelector(`[nodeid="${id}"]`).innerHTML = element.innerHTML;
     }
 
     parseStrToDOM(str){
@@ -68,11 +84,11 @@ class Editor extends Component {
 
         recurcy(body);
 
-        textNodes.forEach( node => {
+        textNodes.forEach( (node, i) => {
             const wrapper = dom.createElement('text-editor');
             node.parentNode.replaceChild(wrapper, node);
             wrapper.appendChild(node);
-            wrapper.contentEditable = "true";
+           wrapper.setAttribute("nodeid", i);
         });
 
         return dom; 
