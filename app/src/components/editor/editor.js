@@ -30,10 +30,10 @@ class Editor extends Component {
     }
 
     open(page){
-        this.currentPage = `../${page}?rnd=${Math.random()}`;
+        this.currentPage = page;
 
         axios
-            .get(`../${page}`)
+            .get(`../${page}?rnd=${Math.random()}`)
             .then( res =>this.parseStrToDOM(res.data))
             .then(this.wrapTextNodes)
             .then( dom => {
@@ -45,6 +45,14 @@ class Editor extends Component {
             .then(()=> this.iframe.load("../temp.html"))
             .then(()=>this.enableEditing())
             
+    }
+
+    save(){
+        const newDom = this.virtualDom.cloneNode(this.virtualDom);
+        this.unwrapTextNodes(newDom);
+        const html = this.serializeDOMtoString(newDom);
+        axios
+        .post("./api/savePage.php",{pageName:this.currentPage,html})
     }
 
     enableEditing(){
@@ -99,6 +107,12 @@ class Editor extends Component {
         return serializer.serializeToString(dom);
     }
 
+    unwrapTextNodes(dom){
+        dom.body.querySelectorAll("text-editor").forEach( element => {
+            element.parentNode.replaceChild(element.firstChild, element);
+        });
+    }
+
     loadPageList(){
         axios
         .get('./api')
@@ -148,7 +162,7 @@ class Editor extends Component {
 
         return (
             <>
-
+            <button onClick={()=> this.save()}>Click</button>
             <iframe src={this.currentPage} frameBorder="0"></iframe>
                 {/* <input type="text" 
                 onChange={ (event) => {
